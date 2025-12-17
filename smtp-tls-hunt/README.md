@@ -6,7 +6,10 @@ Script autonome pour valider des endpoints SMTP en TLS, détecter les problèmes
 
 - Pré-requis : Python 3.10+
 - Cloner le dépôt ou copier le dossier `smtp-tls-hunt/`.
-- Aucune dépendance externe n'est nécessaire (stdlib uniquement).
+- Installer la dépendance requise par `sub.py` pour l'énumération des sous-domaines :
+  ```
+  pip install requests
+  ```
 
 ## Usage
 
