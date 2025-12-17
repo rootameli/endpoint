@@ -27,9 +27,11 @@ VALIDATED_FILE = SCRIPT_DIR / "validated_endpoints.txt"
 class Endpoint:
     host: str
     port: Optional[int] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
 
     def with_port(self, port: int) -> "Endpoint":
-        return Endpoint(self.host, port)
+        return Endpoint(self.host, port, self.username, self.password)
 
     @property
     def label(self) -> str:
@@ -90,6 +92,9 @@ class SMTPTester:
         if port is None:
             return False, ValueError("Port must be specified for TLS attempt")
 
+        username = endpoint.username or self.config.username
+        password = endpoint.password or self.config.password
+
         try:
             context = ssl.create_default_context()
             context.check_hostname = True
@@ -102,8 +107,8 @@ class SMTPTester:
                         smtp,
                         self.config.sender,
                         self.config.recipient,
-                        self.config.username,
-                        self.config.password,
+                        username,
+                        password,
                     )
             else:
                 with smtplib.SMTP(endpoint.host, port, timeout=self.config.timeout) as smtp:
@@ -114,20 +119,22 @@ class SMTPTester:
                         smtp,
                         self.config.sender,
                         self.config.recipient,
-                        self.config.username,
-                        self.config.password,
+                        username,
+                        password,
                     )
             return True, None
         except BaseException as exc:  # noqa: BLE001
             return False, exc
 
     def attempt_plain_no_tls(self, endpoint: Endpoint) -> Tuple[bool, Optional[BaseException]]:
+        username = endpoint.username or self.config.username
+        password = endpoint.password or self.config.password
         try:
             with smtplib.SMTP(endpoint.host, endpoint.port or 25, timeout=self.config.timeout) as smtp:
                 smtp.ehlo()
-                if self.config.username and self.config.password:
-                    smtp.login(self.config.username, self.config.password)
-                self.send_test_message(smtp, self.config.sender, self.config.recipient, self.config.username, self.config.password)
+                if username and password:
+                    smtp.login(username, password)
+                self.send_test_message(smtp, self.config.sender, self.config.recipient, username, password)
             return True, None
         except BaseException as exc:  # noqa: BLE001
             return False, exc
@@ -255,6 +262,7 @@ class SMTPTester:
                 endpoint=ep_with_port.label,
                 status="success" if success else "failure",
                 error=str(error) if error else None,
+                username=ep_with_port.username or self.config.username,
             )
             if success:
                 self.save_validated(ep_with_port)
@@ -272,6 +280,7 @@ class SMTPTester:
                 endpoint=endpoint.label,
                 status="success" if success else "failure",
                 error=str(error) if error else None,
+                username=endpoint.username or self.config.username,
             )
             if success:
                 self.save_validated(endpoint)
@@ -296,6 +305,21 @@ def read_input_file(path: Path) -> List[Endpoint]:
         clean = line.strip()
         if not clean or clean.startswith("#"):
             continue
+
+        if "|" in clean:
+            parts = [part.strip() for part in clean.split("|")]
+            if len(parts) < 2:
+                raise ValueError(f"Invalid pipe-delimited line: {clean}")
+            host = parts[0]
+            try:
+                port_val = int(parts[1]) if parts[1] else None
+            except ValueError:
+                raise ValueError(f"Invalid port in line: {clean}")
+            username = parts[2] if len(parts) > 2 and parts[2] else None
+            password = parts[3] if len(parts) > 3 and parts[3] else None
+            endpoints.append(Endpoint(host, port_val, username, password))
+            continue
+
         if ":" in clean:
             host, port_str = clean.split(":", 1)
             try:

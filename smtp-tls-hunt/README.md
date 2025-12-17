@@ -27,9 +27,9 @@ python smtp_tester.py \
 ```
 
 Options :
-- `--input` : fichier d'entrées `host[:port]` (une par ligne, `#` pour les commentaires).
+- `--input` : fichier d'entrées au format `host[:port]` ou `host|port|username|password` (une par ligne, `#` pour les commentaires). Les identifiants présents sur une ligne priment sur ceux fournis en CLI.
 - `--from` / `--to` : adresses email utilisées pour les tests d'envoi.
-- `--username` / `--password` : identifiants SMTP (facultatifs).
+- `--username` / `--password` : identifiants SMTP (facultatifs, utilisés si la ligne ne fournit pas ses propres identifiants).
 - `--ports` : liste de ports à tester (par défaut `465,587,25`).
 - `--timeout` : timeout réseau (secondes, par défaut 10).
 - `--enum-timeout` : timeout pour l'exécution de `sub.py`.
