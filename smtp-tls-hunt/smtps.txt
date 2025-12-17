@@ -1,0 +1,3 @@
+# Example SMTP endpoints
+smtp.example.com:465
+mail.example.org
