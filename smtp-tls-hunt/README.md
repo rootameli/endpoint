@@ -13,22 +13,18 @@ Script autonome pour valider des endpoints SMTP en TLS, détecter les problèmes
 
 ## Usage
 
+Exécution minimale (tout est prédéfini dans le script) :
 ```
-python smtp_tester.py \
-  --input smtps.txt \
-  --from test@example.com \
-  --to destination@example.com \
-  --username USER \
-  --password PASS \
-  --ports 465,587,25 \
-  --timeout 10 \
-  --enum-timeout 120 \
-  --fallback-plain true
+python smtp-tls.py
 ```
 
-Options :
+Le script utilise par défaut :
+- `smtps.txt` situé dans le même dossier (format `smtpserver|port|username|password`).
+- L'expéditeur est l'identifiant (`username`) de chaque ligne, et le script vous demande l'adresse email de test destinataire au lancement.
+
+Options (toutes facultatives) :
 - `--input` : fichier d'entrées au format `host[:port]` ou `host|port|username|password` (une par ligne, `#` pour les commentaires). Les identifiants présents sur une ligne priment sur ceux fournis en CLI.
-- `--from` / `--to` : adresses email utilisées pour les tests d'envoi.
+- `--from` / `--to` : adresses email utilisées pour les tests d'envoi (si `--to` n'est pas fourni, une invite demandera l'adresse de test).
 - `--username` / `--password` : identifiants SMTP (facultatifs, utilisés si la ligne ne fournit pas ses propres identifiants).
 - `--ports` : liste de ports à tester (par défaut `465,587,25`).
 - `--timeout` : timeout réseau (secondes, par défaut 10).
@@ -57,4 +53,4 @@ Options :
 
 L'option `--fallback-plain true` tente une authentification `AUTH PLAIN` sans chiffrement si tous les essais TLS échouent. Utilisez-la uniquement en environnement contrôlé.
 
-Assurez-vous que `sub.py` se trouve dans le même dossier que `smtp_tester.py`, car il est exécuté via `python sub.py <domain>` lors de l'énumération.
+Assurez-vous que `sub.py` se trouve dans le même dossier que `smtp_tester.py` / `smtp-tls.py`, car il est exécuté via `python sub.py <domain>` lors de l'énumération.

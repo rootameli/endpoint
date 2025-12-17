@@ -21,6 +21,9 @@ from typing import List, Optional, Sequence, Tuple
 SCRIPT_DIR = Path(__file__).resolve().parent
 LOG_FILE = SCRIPT_DIR / "smtp.log"
 VALIDATED_FILE = SCRIPT_DIR / "validated_endpoints.txt"
+DEFAULT_INPUT = SCRIPT_DIR / "smtps.txt"
+DEFAULT_SENDER: Optional[str] = None
+DEFAULT_RECIPIENT: Optional[str] = None
 
 
 @dataclass
@@ -51,7 +54,7 @@ class JsonLogger:
 
 @dataclass
 class SMTPConfig:
-    sender: str
+    sender: Optional[str]
     recipient: str
     username: Optional[str]
     password: Optional[str]
@@ -87,11 +90,17 @@ class SMTPTester:
             smtp.login(username, password)
         smtp.send_message(msg)
 
+    def resolve_identities(self, endpoint: Endpoint) -> Tuple[str, str]:
+        sender = endpoint.username or self.config.sender or self.config.recipient
+        recipient = self.config.recipient
+        return sender, recipient
+
     def attempt_tls(self, endpoint: Endpoint) -> Tuple[bool, Optional[BaseException]]:
         port = endpoint.port
         if port is None:
             return False, ValueError("Port must be specified for TLS attempt")
 
+        sender, recipient = self.resolve_identities(endpoint)
         username = endpoint.username or self.config.username
         password = endpoint.password or self.config.password
 
@@ -103,30 +112,19 @@ class SMTPTester:
             if port == 465:
                 with smtplib.SMTP_SSL(endpoint.host, port, timeout=self.config.timeout, context=context) as smtp:
                     smtp.ehlo()
-                    self.send_test_message(
-                        smtp,
-                        self.config.sender,
-                        self.config.recipient,
-                        username,
-                        password,
-                    )
+                    self.send_test_message(smtp, sender, recipient, username, password)
             else:
                 with smtplib.SMTP(endpoint.host, port, timeout=self.config.timeout) as smtp:
                     smtp.ehlo()
                     smtp.starttls(context=context)
                     smtp.ehlo()
-                    self.send_test_message(
-                        smtp,
-                        self.config.sender,
-                        self.config.recipient,
-                        username,
-                        password,
-                    )
+                    self.send_test_message(smtp, sender, recipient, username, password)
             return True, None
         except BaseException as exc:  # noqa: BLE001
             return False, exc
 
     def attempt_plain_no_tls(self, endpoint: Endpoint) -> Tuple[bool, Optional[BaseException]]:
+        sender, recipient = self.resolve_identities(endpoint)
         username = endpoint.username or self.config.username
         password = endpoint.password or self.config.password
         try:
@@ -134,7 +132,7 @@ class SMTPTester:
                 smtp.ehlo()
                 if username and password:
                     smtp.login(username, password)
-                self.send_test_message(smtp, self.config.sender, self.config.recipient, username, password)
+                self.send_test_message(smtp, sender, recipient, username, password)
             return True, None
         except BaseException as exc:  # noqa: BLE001
             return False, exc
@@ -214,7 +212,9 @@ class SMTPTester:
             content = []
         return content
 
-    def tls_hunt(self, host: str, port: int) -> None:
+    def tls_hunt(self, endpoint: Endpoint) -> None:
+        host = endpoint.host
+        port = endpoint.port or self.config.ports[0]
         best, names = self.extract_certificate_domains(host, port)
         if not best:
             return
@@ -235,17 +235,17 @@ class SMTPTester:
                 continue
             seen.add(candidate)
             for p in self.config.ports:
-                endpoint = Endpoint(candidate, p)
-                success, error = self.attempt_tls(endpoint)
+                candidate_ep = Endpoint(candidate, p, endpoint.username, endpoint.password)
+                success, error = self.attempt_tls(candidate_ep)
                 tested.append({"host": candidate, "port": p, "success": success, "error": str(error) if error else None})
                 if success:
-                    self.save_validated(endpoint)
+                    self.save_validated(candidate_ep)
         self.logger.log("tls_hunt_endpoints", tested=tested, cert_valid_for=best, names=names)
 
         if self.config.fallback_plain and not any(item.get("success") for item in tested):
             fallback_results = []
             for candidate in domain_candidates:
-                endpoint = Endpoint(candidate, 25)
+                endpoint = Endpoint(candidate, 25, endpoint.username, endpoint.password)
                 success, error = self.attempt_plain_no_tls(endpoint)
                 fallback_results.append({"host": candidate, "port": 25, "success": success, "error": str(error) if error else None})
                 if success:
@@ -256,6 +256,7 @@ class SMTPTester:
         ports = [endpoint.port] if endpoint.port else self.config.ports
         for port in ports:
             ep_with_port = endpoint.with_port(port)
+            sender, recipient = self.resolve_identities(ep_with_port)
             success, error = self.attempt_tls(ep_with_port)
             self.logger.log(
                 "initial_tls_test",
@@ -263,13 +264,15 @@ class SMTPTester:
                 status="success" if success else "failure",
                 error=str(error) if error else None,
                 username=ep_with_port.username or self.config.username,
+                sender=sender,
+                recipient=recipient,
             )
             if success:
                 self.save_validated(ep_with_port)
                 return
             if isinstance(error, ssl.SSLCertVerificationError) or isinstance(error, ssl.CertificateError):
                 before = len(self.validated)
-                self.tls_hunt(endpoint.host, port)
+                self.tls_hunt(ep_with_port)
                 if len(self.validated) > before:
                     return
 
@@ -334,9 +337,13 @@ def read_input_file(path: Path) -> List[Endpoint]:
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="SMTP TLS hunter")
-    parser.add_argument("--input", required=True, help="Input file with SMTP endpoints")
-    parser.add_argument("--from", dest="sender", required=True, help="Sender email")
-    parser.add_argument("--to", dest="recipient", required=True, help="Recipient email")
+    parser.add_argument(
+        "--input",
+        default=str(DEFAULT_INPUT),
+        help="Input file with SMTP endpoints (default: smtps.txt next to the script)",
+    )
+    parser.add_argument("--from", dest="sender", default=DEFAULT_SENDER, help="Sender email (defaults to entry username)")
+    parser.add_argument("--to", dest="recipient", default=DEFAULT_RECIPIENT, help="Recipient email (will prompt if missing)")
     parser.add_argument("--username", help="SMTP username")
     parser.add_argument("--password", help="SMTP password")
     parser.add_argument("--ports", default="465,587,25", help="Comma-separated ports to test")
@@ -355,10 +362,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ports = parse_ports(args.ports)
     fallback_plain = str_to_bool(args.fallback_plain)
 
+    recipient = args.recipient
+    if not recipient:
+        recipient = input("Adresse email de test (destinataire): ").strip()
+    if not recipient:
+        print("Une adresse de test est requise.")
+        return 1
+
     logger = JsonLogger(LOG_FILE)
     config = SMTPConfig(
         sender=args.sender,
-        recipient=args.recipient,
+        recipient=recipient,
         username=args.username,
         password=args.password,
         timeout=args.timeout,
@@ -368,6 +382,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
 
     input_file = Path(args.input)
+    if not input_file.is_absolute():
+        input_file = SCRIPT_DIR / input_file
     endpoints = read_input_file(input_file)
 
     tester = SMTPTester(logger, config)
