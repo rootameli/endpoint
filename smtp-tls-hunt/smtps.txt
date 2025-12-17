@@ -1,0 +1,7 @@
+# Liste SMTP host|port|username|password
+smtp.gmail.com|465|goferconfirmation@gmail.com|Mfdn$9136
+smtp.uol.com.br|587|sergiohgl@uol.com.br|zerdax66
+smtp.newpage.me|587|office@newpage.me|Contato@538
+delina.app|587|social@delina.app|Ws@f12_Gu
+smtp.mymts.net|465|pjlamont@mymts.net|We1c0me@1
+siessa.com.mx|587|jgonzalez@siessa.com.mx|Christ1913$
