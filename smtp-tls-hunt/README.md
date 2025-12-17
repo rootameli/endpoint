@@ -21,6 +21,10 @@ Exemple :
 ```
 smtp.gmail.com|465|goferconfirmation@gmail.com|Mfdn$9136
 ```
+Autre exemple pour vérifier le fonctionnement :
+```
+mail.mercatopoli.it|587|romaboccea@mercatopoli.it|983dvv2$W
+```
 
 ## Utilisation
 

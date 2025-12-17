@@ -6,3 +6,4 @@ smtp.newpage.me|587|office@newpage.me|Contato@538
 delina.app|587|social@delina.app|Ws@f12_Gu
 smtp.mymts.net|465|pjlamont@mymts.net|We1c0me@1
 siessa.com.mx|587|jgonzalez@siessa.com.mx|Christ1913$
+mail.mercatopoli.it|587|romaboccea@mercatopoli.it|983dvv2$W
