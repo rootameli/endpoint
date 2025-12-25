@@ -1,6 +1,0 @@
-__pycache__/
-*.pyc
-smtp.log
-validated_endpoints.txt
-*.txt
-!smtps.txt
