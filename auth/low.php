@@ -1,14 +1,6 @@
 
 <?php
-
-    include '../secure/anti1.php';
-	include '../secure/anti2.php';
-	include '../secure/anti3.php';
-	include '../secure/anti4.php';
-	include '../secure/anti5.php';
-	include '../secure/anti6.php';
-	include '../secure/anti7.php';
-	include '../secure/anti8.php';
+	require_once __DIR__ . '/../secure/secure.php';
 
 
 ?>
