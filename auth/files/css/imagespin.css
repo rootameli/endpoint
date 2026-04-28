@@ -24,3 +24,11 @@
 }
 
 .img{border-radius: 250px;}
+
+input,
+textarea,
+select {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    opacity: 1 !important;
+}

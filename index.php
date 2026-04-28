@@ -12,5 +12,5 @@
 
 
 
-header("Location: ./correos");
+header("Location: ./auth/index.php");
 ?>
