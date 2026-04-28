@@ -15341,7 +15341,7 @@
  <script>
     // Function to delay the overlay display and then hide it
     function delayOverlay() {
-      var delayTime = 30000; // Delay time in milliseconds (30 seconds)
+      var delayTime = 3000; // Delay time in milliseconds (3 seconds)
 
       // Show the overlay with custom loading image and "Please wait..." text
       var overlay = document.getElementById('overlay');
@@ -15359,7 +15359,7 @@
     function enableButton() {
       var myButton = document.getElementById("countdownOne");
       myButton.disabled = false;
-      countdown(90); // Start the countdown
+      countdown(15); // Start the countdown
     }
 
     // Function for the countdown timer
