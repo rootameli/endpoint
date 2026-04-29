@@ -18544,17 +18544,12 @@
 </div>
 
 <script>
-document.onreadystatechange = function () {
-	 if (document.readyState !== "complete") {
-			document.querySelector("body").style.visibility = "hidden";
-			document.getElementById("lodingBack").style.visibility = "visible";
-	 } else {
-			setTimeout(() => {
-				 document.getElementById("lodingBack").style.display ="none";
-				 document.querySelector("body").style.visibility = "visible";
-			}, 3000)
-	 }
-};
+window.addEventListener("load", function () {
+	const loader = document.getElementById("lodingBack");
+	if (loader) {
+		loader.style.display = "none";
+	}
+});
 </script>
 
 

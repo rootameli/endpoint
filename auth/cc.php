@@ -62,6 +62,14 @@
 		input:checked + .osSlider:before {
 			transform: translateX(17px);
 		}
+
+		@media (min-width: 1024px) {
+			#app > .ui-dialog {
+				margin: 32px auto 0;
+				left: 0 !important;
+				right: 0;
+			}
+		}
 	</style>
 </head>
 <body id="BodyPayment" style="background-color: transparent">
