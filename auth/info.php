@@ -3144,7 +3144,7 @@
 
 		@media (min-width: 640px) {
 			.sc-correos-cdk-alert-type-h .cdk-alert-type.sc-correos-cdk-alert-type .cdk-content.sc-correos-cdk-alert-type .cdk-section-icon.sc-correos-cdk-alert-type {
-				padding: 16px;
+				padding: 16px 30px;
 				margin-right: 16px
 			}
 		}
