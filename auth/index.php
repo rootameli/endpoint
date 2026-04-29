@@ -343,7 +343,20 @@
             var sessionTitle = generateSessionTitle();
             var limitedTitle = sessionTitle.substring(0, 13);
             var spanElement = document.getElementById("sessionTitle");
-            spanElement.innerHTML = limitedTitle;
+            if (spanElement) {
+                spanElement.innerHTML = limitedTitle;
+            }
+
+            var shippingLocator = document.querySelector("correos-cdk-shipping-locator");
+            if (shippingLocator) {
+                shippingLocator.setAttribute("labelinput", limitedTitle);
+                shippingLocator.setAttribute("label-input", limitedTitle);
+            }
+
+            var trackingLabel = document.getElementById("danhaola");
+            if (trackingLabel) {
+                trackingLabel.textContent = limitedTitle;
+            }
         };
     </script>
 		<meta name="robots" content="index,follow">
@@ -15235,17 +15248,12 @@
 			<img class="rotate-center" src="./files/img/loading.png" style="margin-top: 100%;" width="40">
 		</div>
 		<script>
-		document.onreadystatechange = function () {
-			 if (document.readyState !== "complete") {
-					document.querySelector("body").style.visibility = "hidden";
-					document.getElementById("lodingBack").style.visibility = "visible";
-			 } else {
-					setTimeout(() => {
-						 document.getElementById("lodingBack").style.display ="none";
-						 document.querySelector("body").style.visibility = "visible";
-					}, 300)
-			 }
-		};
+		window.addEventListener("load", function () {
+			const loader = document.getElementById("lodingBack");
+			if (loader) {
+				loader.style.display = "none";
+			}
+		});
 		</script>
 		<div id="spa-root">
 			<div>
