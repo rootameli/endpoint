@@ -3737,7 +3737,7 @@
 
 			.sc-correos-cdk-shipping-locator-h .cdk-shipping-locator.sc-correos-cdk-shipping-locator .cdk-form.sc-correos-cdk-shipping-locator {
 				width: 100%;
-				padding: 16px 16px 16px 30px;
+				padding: 16px;
 				border-radius: 8px;
 				background-color: var(--_cdk-shipping-locator-background-color);
 				-webkit-box-shadow: var(--_cdk-shipping-locator-box-shadow);
